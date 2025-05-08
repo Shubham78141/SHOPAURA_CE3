@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<style>
+    .checkout-container {
+        max-width: 1000px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .checkout-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .checkout-header h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .checkout-header p {
+        color: #666;
+    }
+    
+    .checkout-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+    
+    .shipping-summary, .order-summary {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+    }
+    
+    .shipping-summary h2, .order-summary h2 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .shipping-summary p, .order-summary p {
+        margin-bottom: 0.5rem;
+    }
+    
+    .order-summary ul {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .order-summary li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .order-summary .original-total, .order-summary .discount-savings, .order-summary .total {
+        font-size: 1.25rem;
+        margin-top: 1rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .order-summary .discount-savings {
+        color: #e74c3c;
+    }
+    
+    .order-summary .total {
+        font-weight: bold;
+        border-top: 2px solid #dee2e6;
+    }
+    
+    .checkout-form {
+        margin-top: 2rem;
+        text-align: center;
+    }
+    
+    .checkout-form button {
+        padding: 1rem 2rem;
+        background: #000;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.3s;
+    }
+    
+    .checkout-form button:hover {
+        background: #333;
+        transform: translateY(-2px);
+    }
+    
+    @media (max-width: 768px) {
+        .checkout-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="checkout-container">
+    <div class="checkout-header">
+        <h1>Checkout</h1>
+        <p>Review your order and confirm your details</p>
+    </div>
+    
+    <div class="checkout-grid">
+        <div class="shipping-summary">
+            <h2>Shipping Details</h2>
+            <p><strong>Address:</strong> {{ shipping_details.address }}</p>
+            <p><strong>City:</strong> {{ shipping_details.city }}</p>
+            <p><strong>State:</strong> {{ shipping_details.state }}</p>
+            <p><strong>Zip Code:</strong> {{ shipping_details.zip_code }}</p>
+            <p><strong>Country:</strong> {{ shipping_details.country }}</p>
+        </div>
+        
+        <div class="order-summary">
+            <h2>Order Summary</h2>
+            <ul>
+                {% for item in cart_items %}
+                    <li>
+                        <span>{{ item.product.name }} - {{ item.quantity }} x ₹{{ item.product.price|floatformat:2 }}</span>
+                        <span>₹{{ item.total_price|floatformat:2 }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+            {% if discount_savings > 0 %}
+                <div class="original-total">
+                    <span>Original Total:</span>
+                    <span>₹{{ total|add:discount_savings|floatformat:2 }}</span>
+                </div>
+                <div class="discount-savings">
+                    <span>Discount Savings:</span>
+                    <span>-₹{{ discount_savings|floatformat:2 }}</span>
+                </div>
+            {% endif %}
+            <div class="total">
+                <span>Total:</span>
+                <span>₹{{ total|floatformat:2 }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <form class="checkout-form" method="POST">
+        {% csrf_token %}
+        <button type="submit">Place Order</button>
+    </form>
+</div>
+
+{% endblock %}

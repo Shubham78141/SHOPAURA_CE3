@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Shipping Details{% endblock %}
+
+{% block content %}
+<div class="shipping-container">
+    <div class="shipping-header">
+        <h1>Shipping Details</h1>
+        <p>Please enter your shipping details</p>
+    </div>
+    <form class="shipping-form" method="POST">
+        {% csrf_token %}
+        <input type="text" name="address" placeholder="Address" required>
+        <input type="text" name="city" placeholder="City" required>
+        <input type="text" name="state" placeholder="State" required>
+        <input type="text" name="zip_code" placeholder="Zip Code" required>
+        <input type="text" name="country" placeholder="Country" required>
+        <button type="submit">Continue to Checkout</button>
+    </form>
+</div>
+
+<style>
+    .shipping-container {
+        max-width: 800px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+    }
+    
+    .shipping-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .shipping-header h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .shipping-header p {
+        color: #666;
+    }
+    
+    .shipping-form {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 1s ease-in-out;
+    }
+    
+    .shipping-form input {
+        width: 100%;
+        padding: 0.8rem;
+        margin-bottom: 1rem;
+        border: 2px solid #dee2e6;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+    
+    .shipping-form input:focus {
+        border-color: #000;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .shipping-form button {
+        width: 100%;
+        padding: 1rem;
+        background: #000;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.3s ease;
+    }
+    
+    .shipping-form button:hover {
+        background: #333;
+        transform: translateY(-2px);
+    }
+    
+    .shipping-form button:active {
+        transform: translateY(0);
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}

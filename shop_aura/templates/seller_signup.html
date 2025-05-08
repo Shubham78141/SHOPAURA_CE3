@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block title %}Seller Sign Up{% endblock %}
+
+{% block content %}
+<div class="signup-container">
+    <div class="signup-box">
+        <h1>Become a Seller</h1>
+        <p>Join SHOPAURA and start selling your products today!</p>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="error-message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div class="name-fields">
+                <div class="form-group">
+                    <label for="id_first_name">First Name</label>
+                    {{ user_form.first_name }}
+                    {{ user_form.first_name.errors }}
+                </div>
+                <div class="form-group">
+                    <label for="id_last_name">Last Name</label>
+                    {{ user_form.last_name }}
+                    {{ user_form.last_name.errors }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="id_email">Email</label>
+                {{ user_form.email }}
+                {{ user_form.email.errors }}
+            </div>
+            <div class="form-group">
+                <label for="id_company_name">Company Name</label>
+                {{ seller_form.company_name }}
+                {{ seller_form.company_name.errors }}
+            </div>
+            <div class="form-group">
+                <label for="id_password1">Password</label>
+                {{ user_form.password1 }}
+                {{ user_form.password1.errors }}
+            </div>
+            <div class="form-group">
+                <label for="id_password2">Confirm Password</label>
+                {{ user_form.password2 }}
+                {{ user_form.password2.errors }}
+            </div>
+            <button type="submit" class="signup-button">Create Seller Account</button>
+        </form>
+        <div class="login-link">
+            <p>Already a seller? <a href="{% url 'seller_login' %}">Log in</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.signup-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.signup-box {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 600px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideIn 0.6s ease-out forwards;
+}
+
+.signup-box h1 {
+    text-align: center;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.signup-box p {
+    text-align: center;
+    color: #555;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+.name-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+    transition: color 0.3s;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.85rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+    background: #fafafa;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+    background: white;
+}
+
+.signup-button {
+    width: 100%;
+    padding: 1rem;
+    background: black;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.3s, background 0.3s;
+}
+
+.signup-button:hover {
+    background: linear-gradient(90deg, #0056b3, #003d80);
+    transform: translateY(-2px);
+}
+
+.signup-button:active {
+    transform: translateY(0);
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.95rem;
+    color: #666;
+}
+
+.login-link a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    text-align: center;
+}
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .signup-box {
+        padding: 1.5rem;
+        max-width: 90%;
+    }
+    .name-fields {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

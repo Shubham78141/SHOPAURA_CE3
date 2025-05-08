@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+
+{% block title %}Track Order #{{ order.id }}{% endblock %}
+
+{% block content %}
+<style>
+    .tracking-section {
+        padding: 4rem 1.25rem;
+        max-width: 1000px;
+        margin: 0 auto;
+        background: #f3f4f6;
+        min-height: 100vh;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .tracking-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .tracking-title {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+
+    .tracking-subtitle {
+        font-size: 1rem;
+        color: #6b7280;
+    }
+
+    .tracking-card {
+        background: #ffffff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+
+    .order-summary h3,
+    .tracking-progress h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid #3b82f6;
+        padding-bottom: 0.5rem;
+    }
+
+    .order-summary p {
+        font-size: 1rem;
+        color: #4b5563;
+        margin-bottom: 0.5rem;
+    }
+
+    .order-summary p strong {
+        color: #111827;
+        font-weight: 600;
+    }
+
+    .progress-container {
+        margin: 2rem 0;
+    }
+
+    .progress-bar {
+        background: #e5e7eb;
+        border-radius: 12px;
+        height: 12px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .progress-fill {
+        background: #3b82f6;
+        height: 100%;
+        transition: width 0.5s ease-in-out;
+    }
+
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+    }
+
+    .step {
+        text-align: center;
+        flex: 1;
+        position: relative;
+    }
+
+    .step-circle {
+        width: 24px;
+        height: 24px;
+        background: #e5e7eb;
+        border: 3px solid #ffffff;
+        border-radius: 50%;
+        margin: 0 auto 0.5rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        position: relative;
+        z-index: 1;
+    }
+
+    .step.active .step-circle {
+        background: #3b82f6;
+    }
+
+    .step.completed .step-circle {
+        background: #3b82f6;
+        border-color: #ffffff;
+    }
+
+    .step.completed::after {
+        content: '✔';
+        color: #ffffff;
+        position: absolute;
+        top: 2px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 14px;
+    }
+
+    .step-label {
+        font-size: 0.9rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .step.active .step-label,
+    .step.completed .step-label {
+        color: #111827;
+        font-weight: 600;
+    }
+
+    .tracking-history ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .tracking-history ul li {
+        font-size: 0.95rem;
+        color: #4b5563;
+        margin-bottom: 0.75rem;
+        padding-left: 1.5rem;
+        position: relative;
+    }
+
+    .tracking-history ul li::before {
+        content: '→';
+        color: #3b82f6;
+        position: absolute;
+        left: 0;
+        font-size: 1rem;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.7rem 1.5rem;
+        background: #6b7280;
+        color: #ffffff;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 1rem;
+        transition: background 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background: #4b5563;
+    }
+
+    @media (max-width: 768px) {
+        .tracking-section {
+            padding: 2rem 1rem;
+        }
+
+        .tracking-title {
+            font-size: 1.8rem;
+        }
+
+        .tracking-card {
+            padding: 1.5rem;
+        }
+
+        .step-label {
+            font-size: 0.8rem;
+        }
+
+        .step-circle {
+            width: 20px;
+            height: 20px;
+        }
+    }
+</style>
+
+<section class="tracking-section">
+    <div class="tracking-header">
+        <h1 class="tracking-title">Track Order #{{ order.id }}</h1>
+        <p class="tracking-subtitle">Follow the progress of your order</p>
+    </div>
+
+    <div class="tracking-card">
+        <div class="order-summary">
+            <h3>Order Summary</h3>
+            <p><strong>Order Date:</strong> {{ order.created_at|date:"M d, Y" }}</p>
+            <p><strong>Total:</strong> ₹{{ order.total_amount|floatformat:2 }}</p>
+            <p><strong>Shipping Address:</strong> {{ order.address }}, {{ order.city }}, {{ order.state }} {{ order.zip_code }}, {{ order.country }}</p>
+            <p><strong>Items:</strong></p>
+            <ul>
+                {% for item in order.order_items.all %}
+                    <li>{{ item.product.name }} (Qty: {{ item.quantity }}) - ₹{{ item.total_price|floatformat:2 }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="tracking-progress">
+            <h3>Order Progress</h3>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ progress }}%;"></div>
+                </div>
+                <div class="progress-steps">
+                    {% for status in status_order %}
+                        <div class="step {% if order.status == status %}active{% endif %} {% if status in completed_statuses %}completed{% endif %}">
+                            <div class="step-circle"></div>
+                            <div class="step-label">{{ status }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="tracking-history">
+            <h3>Tracking History</h3>
+            {% if tracking_history %}
+                <ul>
+                    {% for entry in tracking_history %}
+                        <li>{{ entry.status }} - {{ entry.updated_at|date:"M d, Y H:i" }} {% if entry.notes %}({{ entry.notes }}){% endif %}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No tracking history available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <a href="{% url 'profile' %}" class="back-btn">Back to Profile</a>
+</section>
+{% endblock %}

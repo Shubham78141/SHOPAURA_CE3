@@ -1,0 +1,58 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Customer Management{% endblock %}
+
+{% block header_buttons %}
+<form class="d-flex">
+    <input class="form-control me-2" type="search" name="q" value="{{ search_query }}" placeholder="Search by email or name">
+    <button class="btn btn-outline-primary btn-sm" type="submit">Search</button>
+</form>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Customer List</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Name</th>
+                        <th>Joined</th>
+                        <th>Orders</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr>
+                        <td>{{ customer.email }}</td>
+                        <td>
+                            {% if customer.first_name or customer.last_name %}
+                                {{ customer.first_name }} {{ customer.last_name }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>{{ customer.date_joined|date:"M d, Y" }}</td>
+                        <td>{{ customer.order_set.count }}</td>
+                        <td>
+                            <span class="badge {% if customer.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ customer.is_active|yesno:"Active,Inactive" }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No customers found matching your search criteria.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

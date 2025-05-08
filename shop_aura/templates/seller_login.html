@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block title %}Seller Login{% endblock %}
+
+{% block content %}
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    /* Removed overflow: hidden to allow scrolling */
+}
+
+.login-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.login-box {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    transform: scale(0.8);
+    opacity: 0;
+    animation: fadeInScale 0.8s ease-in-out forwards;
+}
+
+.login-box h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    color: #000;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #000;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-button {
+    width: 100%;
+    padding: 1rem;
+    background: #000;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.3s, background-color 0.3s;
+}
+
+.login-button:hover {
+    background: #333;
+    transform: scale(1.05);
+}
+
+.forgot-password {
+    text-align: center;
+    margin-top: 1rem;
+    opacity: 0;
+    animation: fadeIn 1s ease-in-out 0.5s forwards;
+}
+
+.forgot-password a {
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+}
+
+.signup-link {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+    opacity: 0;
+    animation: fadeIn 1s ease-in-out 0.7s forwards;
+}
+
+.signup-link p {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.signup-link a {
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+    .login-box {
+        padding: 1.5rem;
+    }
+}
+
+.login-box .error-message {
+    color: #ff4444;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+/* Ensure field-specific errors are styled */
+.form-group .error-message {
+    color: #ff4444;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+</style>
+
+<div class="login-container">
+    <div class="login-box">
+        <h1>Seller Login</h1>
+        
+        <!-- Display messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="error-message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        
+        <!-- Display non-field form errors -->
+        {% if form.non_field_errors %}
+            <div class="error-message">
+                {{ form.non_field_errors|join:"<br>" }}
+            </div>
+        {% endif %}
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">Email</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="error-message">{{ form.username.errors|join:"<br>" }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_password">Password</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <div class="error-message">{{ form.password.errors|join:"<br>" }}</div>
+                {% endif %}
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" name="remember_me" id="remember_me">
+                <label for="remember_me">Remember me</label>
+            </div>
+            <button type="submit" class="login-button">Sign In</button>
+            
+            <div class="forgot-password">
+                <a href="{% url 'password_reset' %}">Forgot Password?</a>
+            </div>
+            <div class="signup-link">
+                <p>Don't have a seller account? <a href="{% url 'seller_signup' %}">Sign up</a></p>
+            </div>
+            <div class="signup-link">
+                <p>Note: After entering your credentials, you will receive an OTP on your email to verify your login.</p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

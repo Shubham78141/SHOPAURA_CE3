@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment{% endblock %}
+
+{% block content %}
+<div class="payment-container">
+    <div class="payment-header">
+        <h1>Payment</h1>
+        <p>Review your order and confirm payment</p>
+    </div>
+    
+    <div class="order-summary">
+        <h2>Order Summary</h2>
+        <p><strong>Order Number:</strong> #{{ order.id }}</p>
+        <p><strong>Total Amount:</strong> ₹{{ total }}</p>
+    </div>
+    
+    <div class="shipping-details">
+        <h2>Shipping Address</h2>
+        <p>{{ shipping_details.address }}</p>
+        <p>{{ shipping_details.city }}, {{ shipping_details.state }} {{ shipping_details.zip_code }}</p>
+        <p>{{ shipping_details.country }}</p>
+    </div>
+    
+    <div class="payment-options">
+        <h2>Payment Options</h2>
+        <form class="payment-form" method="POST" id="paymentForm">
+            {% csrf_token %}
+            <div class="option">
+                <input type="radio" id="upi" name="payment_method" value="upi" onchange="toggleFields()" required>
+                <label for="upi"><i class="fas fa-wallet"></i> UPI</label>
+            </div>
+            <div class="option">
+                <input type="radio" id="credit_card" name="payment_method" value="credit_card" onchange="toggleFields()">
+                <label for="credit_card"><i class="fas fa-credit-card"></i> Credit Card</label>
+            </div>
+            <div class="field" id="credit-card-field" style="display: none;">
+                <input type="text" name="card_number" id="credit_card_number" placeholder="Card Number" class="payment-input" pattern="\d{16}" title="Card number must be 16 digits" required>
+                <input type="text" name="expiry" placeholder="MM/YY" class="payment-input half-width" pattern="\d{2}/\d{2}" title="Expiry must be MM/YY" required>
+                <input type="text" name="cvv" placeholder="CVV" class="payment-input half-width" pattern="\d{3}" title="CVV must be 3 digits" required>
+            </div>
+            
+            <div class="option">
+                <input type="radio" id="debit_card" name="payment_method" value="debit_card" onchange="toggleFields()">
+                <label for="debit_card"><i class="fas fa-credit-card"></i> Debit Card</label>
+            </div>
+            <div class="field" id="debit-card-field" style="display: none;">
+                <input type="text" name="card_number" id="debit_card_number" placeholder="Card Number" class="payment-input" pattern="\d{16}" title="Card number must be 16 digits" required>
+                <input type="text" name="expiry" placeholder="MM/YY" class="payment-input half-width" pattern="\d{2}/\d{2}" title="Expiry must be MM/YY" required>
+                <input type="text" name="cvv" placeholder="CVV" class="payment-input half-width" pattern="\d{3}" title="CVV must be 3 digits" required>
+            </div>
+            
+            <div class="option">
+                <input type="radio" id="cod" name="payment_method" value="cod" onchange="toggleFields()">
+                <label for="cod"><i class="fas fa-money-bill-wave"></i> Cash on Delivery</label>
+            </div>
+            
+            <button type="submit">Confirm Payment</button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .payment-container {
+        max-width: 800px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+    }
+    
+    .payment-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .payment-header h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .payment-header p {
+        color: #666;
+    }
+    
+    .order-summary, .shipping-details, .payment-options {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+    
+    .order-summary h2, .shipping-details h2, .payment-options h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .order-summary p, .shipping-details p {
+        margin: 0.5rem 0;
+        color: #333;
+    }
+    
+    .payment-options .option {
+        margin: 0.5rem 0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .payment-options input[type="radio"] {
+        margin-right: 0.5rem;
+    }
+    
+    .payment-options label {
+        font-size: 1rem;
+        color: #333;
+    }
+    
+    .payment-input {
+        width: 100%;
+        padding: 0.75rem;
+        margin: 0.5rem 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+    
+    .half-width {
+        width: 48%;
+        display: inline-block;
+        margin-right: 4%;
+    }
+    
+    .half-width:last-child {
+        margin-right: 0;
+    }
+    
+    .payment-form {
+        text-align: center;
+    }
+    
+    .payment-form button {
+        padding: 1rem 2rem;
+        background: #000;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+    
+    .payment-form button:hover {
+        background: #333;
+    }
+    
+    .error {
+        color: red;
+        font-size: 0.9rem;
+        margin-top: 0.2rem;
+    }
+</style>
+
+<script>
+    function toggleFields() {
+        const creditCardField = document.getElementById('credit-card-field');
+        const debitCardField = document.getElementById('debit-card-field');
+        const creditCardRadio = document.getElementById('credit_card');
+        const debitCardRadio = document.getElementById('debit_card');
+        
+        // Hide all fields by default
+        creditCardField.style.display = 'none';
+        debitCardField.style.display = 'none';
+        
+        // Show fields based on selected payment method
+        if (creditCardRadio.checked) {
+            creditCardField.style.display = 'block';
+        } else if (debitCardRadio.checked) {
+            debitCardField.style.display = 'block';
+        }
+        
+        // Enable/disable required attribute
+        const creditCardInputs = creditCardField.querySelectorAll('input');
+        const debitCardInputs = debitCardField.querySelectorAll('input');
+        
+        creditCardInputs.forEach(input => {
+            input.required = creditCardRadio.checked;
+        });
+        debitCardInputs.forEach(input => {
+            input.required = debitCardRadio.checked;
+        });
+    }
+
+    // Validate form on submit
+    document.getElementById('paymentForm').addEventListener('submit', function(event) {
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+        if (!paymentMethod) {
+            event.preventDefault();
+            alert('Please select a payment method.');
+            return;
+        }
+        
+        // Validate card fields if credit/debit card is selected
+        if (paymentMethod.value === 'credit_card' || paymentMethod.value === 'debit_card') {
+            const cardNumber = document.querySelector(`#${paymentMethod.value}_number`);
+            const expiry = document.querySelector(`input[name="expiry"]`);
+            const cvv = document.querySelector(`input[name="cvv"]`);
+            
+            if (!/^\d{16}$/.test(cardNumber.value)) {
+                event.preventDefault();
+                alert('Card number must be 16 digits.');
+                return;
+            }
+            
+            if (!/^\d{2}\/\d{2}$/.test(expiry.value)) {
+                event.preventDefault();
+                alert('Expiry must be in MM/YY format.');
+                return;
+            }
+            
+            if (!/^\d{3}$/.test(cvv.value)) {
+                event.preventDefault();
+                alert('CVV must be 3 digits.');
+                return;
+            }
+        }
+    });
+</script>
+{% endblock %}

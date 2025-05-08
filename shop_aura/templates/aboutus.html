@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12">
+    <h1 class="text-4xl font-bold text-center mb-12">About Shop Aura</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+        <div>
+            <h2 class="text-2xl font-semibold mb-4">Our Story</h2>
+            <p class="text-gray-600 mb-4">Shop Aura started in 2020 with a vision to create a premium online shopping destination that offers high-quality products at affordable prices. What began as a small venture has now grown into one of India's most trusted e-commerce platforms.</p>
+            <p class="text-gray-600 mb-4">Our journey has been defined by a commitment to excellence, customer satisfaction, and continuous innovation. We've worked tirelessly to curate a collection that meets the diverse needs of our growing customer base.</p>
+            <p class="text-gray-600">Today, we serve thousands of customers across India, delivering joy and satisfaction with every package we ship.</p>
+        </div>
+        <div class="flex justify-center items-center">
+            <div class="rounded-full w-64 h-64 bg-gray-100 flex items-center justify-center">
+                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#4F46E5" stroke-width="2"/>
+                    <path d="M15 9L9 15" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M9 9L15 15" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-gray-50 p-8 rounded-lg mb-16">
+        <h2 class="text-2xl font-semibold mb-4 text-center">Our Mission</h2>
+        <p class="text-gray-600 text-center max-w-3xl mx-auto">To create the most delightful online shopping experience for our customers by offering quality products, excellent customer service, and innovative solutions that make everyday life better.</p>
+    </div>
+    
+    <div class="mb-16">
+        <h2 class="text-2xl font-semibold mb-8 text-center">What Sets Us Apart</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex justify-center mb-4">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 13L9 17L19 7" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-medium mb-2 text-center">Quality Products</h3>
+                <p class="text-gray-600 text-center">We carefully source and vet every product in our catalog to ensure it meets our high standards.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex justify-center mb-4">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M20 20C20 16.6863 16.4183 14 12 14C7.58172 14 4 16.6863 4 20" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-medium mb-2 text-center">Customer Focus</h3>
+                <p class="text-gray-600 text-center">We prioritize customer satisfaction with 24/7 support and a hassle-free return policy.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex justify-center mb-4">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-medium mb-2 text-center">Fast Delivery</h3>
+                <p class="text-gray-600 text-center">We ensure quick and reliable shipping with real-time tracking for all orders.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="flex justify-center">
+        <a href="{% url 'contact' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md">
+            Get In Touch
+        </a>
+    </div>
+</div>
+{% endblock %}

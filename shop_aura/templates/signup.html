@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: white;
+}
+
+.signup-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.signup-box {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.signup-box h1 {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    color: #000;
+}
+
+.signup-box p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.name-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #000;
+}
+
+.signup-button {
+    width: 100%;
+    padding: 1rem;
+    background: #000;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 1rem;
+}
+
+.signup-button:hover {
+    background: #333;
+}
+
+.social-signup {
+    margin: 1.5rem 0;
+    position: relative;
+    text-align: center;
+}
+
+.social-signup::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #eee;
+}
+
+.social-signup span {
+    position: relative;
+    background: white;
+    padding: 0 1rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.google-button {
+    width: 100%;
+    padding: 1rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background-color 0.3s;
+}
+
+.google-button:hover {
+    background: #f5f5f5;
+}
+
+
+.google-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.login-link p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.login-link a {
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+.terms {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 1rem;
+}
+
+.terms a {
+    color: #000;
+    text-decoration: none;
+}
+
+.terms a:hover {
+    text-decoration: underline;
+}
+
+/* Adjusting the Signup Box Dimensions */
+.signup-box {
+max-width: 570px; /* Increased width */
+padding: 1.0rem; /* Reduced padding */
+border-radius: 10px;
+animation: fadeInScale 0.8s ease-in-out; /* Same animation as login */
+}
+
+/* Reduce spacing between form elements */
+.form-group {
+margin-bottom: 1rem; /* Reduced spacing */
+}
+
+/* Smaller button size */
+.signup-button,
+.google-button {
+padding: 0.8rem; /* Reduce button height */
+font-size: 0.9rem;
+transition: transform 0.4s ease-in-out;
+}
+
+/* Smooth hover effect */
+.signup-button:hover,
+.google-button:hover {
+transform: scale(1.03);
+}
+
+.header-content a:last-child {
+margin-left: auto;
+}
+
+/* Animation: Fade In with Scale Effect */
+@keyframes fadeInScale {
+from {
+opacity: 0;
+transform: scale(0.9);
+}
+to {
+opacity: 1;
+transform: scale(1);
+}
+}
+
+
+@media (max-width: 768px) {
+    .signup-box {
+        padding: 1.5rem;
+    }
+
+    .name-fields {
+        grid-template-columns: 1fr;
+    }
+}
+.error-message {
+    color: #ff4444;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    color: #333;
+}
+
+.verification-notice {
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+</style>
+
+<div class="signup-container">
+    <div class="signup-box">
+        <h1>Create Account</h1>
+        <p>Join us and start shopping!</p>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="error-message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div class="name-fields">
+                <div class="form-group">
+                    <label for="id_first_name">First Name</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <div class="error-message">{{ form.first_name.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="id_last_name">Last Name</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <div class="error-message">{{ form.last_name.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="id_email">Email</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="error-message">{{ form.email.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_password1">Password</label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                    <div class="error-message">{{ form.password1.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_password2">Confirm Password</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                    <div class="error-message">{{ form.password2.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" name="terms" id="terms" required>
+                <label for="terms">I agree to the <a href="/terms">Terms of Service</a> & <a href="/privacy">Privacy Policy</a></label>
+            </div>
+            <button type="submit" class="signup-button">Create Account</button>
+            
+            <div class="verification-notice">
+                We'll send you an email to verify your account.
+            </div>
+            
+            <div class="social-signup">
+                <span>Or sign up with</span>
+            </div>
+            <button type="button" class="google-button">
+                <svg class="google-icon" viewBox="0 0 24 24">
+                    <!-- Google SVG remains unchanged -->
+                </svg>
+                Continue with Google
+            </button>
+            <div class="login-link">
+                <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,149 @@
+{% load template_filters %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #111827, #374151);
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 20px;
+        }
+        .content h2 {
+            font-size: 20px;
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+        .order-details, .shipping-details, .summary {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background-color: #f9fafb;
+            color: #4b5563;
+            font-weight: 600;
+        }
+        td {
+            color: #1f2937;
+        }
+        .total {
+            font-weight: bold;
+            font-size: 16px;
+            color: #1f2937;
+        }
+        .footer {
+            background-color: #f9fafb;
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .footer a {
+            color: #dc2626;
+            text-decoration: none;
+        }
+        .highlight {
+            color: #dc2626;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ShopAura - Billing Invoice</h1>
+        </div>
+        <div class="content">
+            <h2>Thank You for Your Order!</h2>
+            <p>Dear {{ user.first_name }} {{ user.last_name }},</p>
+            <p>Your payment for Order #{{ order.id }} has been successfully processed. Below is your billing invoice.</p>
+
+            <div class="order-details">
+                <h2>Order Details</h2>
+                <p><strong>Order ID:</strong> {{ order.id }}</p>
+                <p><strong>Order Date:</strong> {{ order.created_at|date:"F d, Y" }}</p>
+                <p><strong>Payment Status:</strong> {{ order.payment_status }}</p>
+                <p><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</p>
+                <p><strong>Order Status:</strong> {{ order.status }}</p>
+            </div>
+
+            <div class="items">
+                <h2>Items Purchased</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Size</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.order_items.all %}
+                        <tr>
+                            <td>{{ item.product.name }}</td>
+                            <td>{{ item.selected_size|default:"-" }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>₹{{ item.price }}</td>
+                            <td>₹{{ item.price|multiply:item.quantity|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="summary">
+                <h2>Billing Summary</h2>
+                <p><strong>Subtotal:</strong> ₹{{ subtotal }}</p>
+                {% if discount_savings > 0 %}
+                <p><strong>Discount Savings:</strong> -₹{{ discount_savings }}</p>
+                {% endif %}
+                <p class="total"><strong>Total:</strong> ₹{{ order.total_amount }}</p>
+            </div>
+
+            <div class="shipping-details">
+                <h2>Shipping Address</h2>
+                <p>{{ order.address }}</p>
+                <p>{{ order.city }}, {{ order.state }} {{ order.zip_code }}</p>
+                <p>{{ order.country }}</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p>Thank you for shopping with ShopAura!</p>
+            <p>Visit us at <a href="{{ website_url }}">ShopAura</a> | Contact us at shopAura002@gmail.com</p>
+        </div>
+    </div>
+</body>
+</html>

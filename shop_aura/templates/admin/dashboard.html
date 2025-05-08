@@ -1,0 +1,358 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block header_buttons %}
+<div class="btn-group me-2">
+    <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+    <button type="button" class="btn btn-sm btn-outline-secondary">Print</button>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <!-- Sales Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Today's Sales</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            ₹{{ sales_data.today.total|default:"0"|floatformat:2 }}</div>
+                        <div class="mt-2 text-muted text-sm">
+                            {{ sales_data.today.count|default:"0" }} orders
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weekly Sales Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Weekly Sales</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            ₹{{ sales_data.week.total|default:"0"|floatformat:2 }}</div>
+                        <div class="mt-2 text-muted text-sm">
+                            {{ sales_data.week.count|default:"0" }} orders
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Sales Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Monthly Sales</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            ₹{{ sales_data.month.total|default:"0"|floatformat:2 }}</div>
+                        <div class="mt-2 text-muted text-sm">
+                            {{ sales_data.month.count|default:"0" }} orders
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customers Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Customers</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ customer_stats.total }}</div>
+                        <div class="mt-2 text-muted text-sm">
+                            {{ customer_stats.new_week }} new this week
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Sales Chart -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Sales Overview</h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                        aria-labelledby="dropdownMenuLink">
+                        <div class="dropdown-header">Time Period:</div>
+                        <a class="dropdown-item" href="#" onclick="updateChart(7)">Last 7 Days</a>
+                        <a class="dropdown-item" href="#" onclick="updateChart(30)">Last 30 Days</a>
+                        <a class="dropdown-item" href="#" onclick="updateChart(90)">Last 90 Days</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#" onclick="exportChartData()">Export Data</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Alerts -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-warning">Low Stock Alerts</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Stock</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in low_stock %}
+                            <tr>
+                                <td>{{ product.name }}</td>
+                                <td class="{% if product.stock < 3 %}text-danger{% endif %}">
+                                    {{ product.stock }}
+                                </td>
+                                <td>
+                                    <a href="{% url 'admin_product_edit' product.id %}" 
+                                       class="btn btn-sm btn-outline-primary">Reorder</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center">No low stock items</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Orders -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Recent Orders</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr>
+                                <td><a href="{% url 'admin_orders' %}">{{ order.id }}</a></td>
+                                <td>{{ order.user.username }}</td>
+                                <td>
+                                    <span class="badge bg-{{ order.get_status_class }}">
+                                        {{ order.status }}
+                                    </span>
+                                </td>
+                                <td>₹{{ order.total_amount }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No recent orders</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Campaigns -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Active Campaigns</h6>
+                <a href="{% url 'admin_marketing' %}" class="btn btn-sm btn-primary">New Campaign</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Campaign</th>
+                                <th>Period</th>
+                                <th>Budget</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for campaign in active_campaigns %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'admin_campaign_detail' campaign.id %}">
+                                        {{ campaign.name }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {{ campaign.start_date|date:"M d" }} - {{ campaign.end_date|date:"M d" }}
+                                </td>
+                                <td>₹{{ campaign.budget }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if campaign.status == 'active' %}bg-success
+                                        {% elif campaign.status == 'planned' %}bg-info
+                                        {% else %}bg-secondary{% endif %}">
+                                        {{ campaign.status|capfirst }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No active campaigns</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+    // Sales Chart
+    const salesChartCtx = document.getElementById('salesChart').getContext('2d');
+    const salesChart = new Chart(salesChartCtx, {
+        type: 'line',
+        data: {
+            labels: [{% for day in sales_trend %}'{{ day.date }}',{% endfor %}],
+            datasets: [{
+                label: 'Sales (₹)',
+                tension: 0.3,
+                backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                borderColor: 'rgba(78, 115, 223, 1)',
+                pointRadius: 3,
+                pointBackgroundColor: 'rgba(78, 115, 223, 1)',
+                pointBorderColor: 'rgba(78, 115, 223, 1)',
+                pointHoverRadius: 3,
+                pointHoverBackgroundColor: 'rgba(78, 115, 223, 1)',
+                pointHoverBorderColor: 'rgba(78, 115, 223, 1)',
+                pointHitRadius: 10,
+                pointBorderWidth: 2,
+                data: [{% for day in sales_trend %}{{ day.sales }},{% endfor %}]
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    ticks: {
+                        beginAtZero: true,
+                        callback: function(value) {
+                            return '₹' + value;
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return '₹' + context.parsed.y.toFixed(2);
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Update chart with different time period
+    function updateChart(days) {
+        fetch(`/admin/api/chart-data/?days=${days}`)
+            .then(response => response.json())
+            .then(data => {
+                salesChart.data.labels = data.data.map(item => item.date);
+                salesChart.data.datasets[0].data = data.data.map(item => item.sales);
+                salesChart.update();
+            })
+            .catch(error => console.error('Error fetching chart data:', error));
+    }
+
+    // Export chart data
+    function exportChartData() {
+        const labels = salesChart.data.labels;
+        const salesData = salesChart.data.datasets[0].data;
+        
+        let csvContent = "data:text/csv;charset=utf-8,Date,Sales\n";
+        
+        for (let i = 0; i < labels.length; i++) {
+            csvContent += `${labels[i]},${salesData[i]}\n`;
+        }
+        
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "sales_data.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+{% endblock %}
+{% endblock %}

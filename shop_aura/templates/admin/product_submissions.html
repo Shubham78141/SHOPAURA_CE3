@@ -1,0 +1,66 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Product Submissions{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Seller Product Submissions</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Seller</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for submission in submissions %}
+                    <tr>
+                        <td>{{ submission.name }}</td>
+                        <td>{{ submission.seller.user.email }}</td>
+                        <td>{{ submission.category }}</td>
+                        <td>₹{{ submission.price }}</td>
+                        <td>{{ submission.stock }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if submission.status == 'Pending' %}bg-warning
+                                {% elif submission.status == 'Approved' %}bg-success
+                                {% else %}bg-danger{% endif %}"
+                            >
+                                {{ submission.status }}
+                            </span>
+                        </td>
+                        <td>{{ submission.submitted_at|date:"M d, Y" }}</td>
+                        <td>
+                            {% if submission.status == 'Pending' %}
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="submission_id" value="{{ submission.id }}">
+                                    <input type="number" name="stock" placeholder="Set stock" class="form-control d-inline-block w-auto" min="0" style="width: 80px;">
+                                    <textarea name="admin_comments" class="form-control mt-2" placeholder="Comments (optional)" rows="2"></textarea>
+                                    <button type="submit" name="action" value="approve" class="btn btn-sm btn-success mt-2">Approve</button>
+                                    <button type="submit" name="action" value="reject" class="btn btn-sm btn-danger mt-2">Reject</button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center">No product submissions found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

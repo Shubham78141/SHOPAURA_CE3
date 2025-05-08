@@ -1,0 +1,675 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.api_name }}{% endblock %}
+
+{% block content %}
+<style>
+    /* Container for the product detail section */
+    .product-detail {
+        max-width: 1280px;
+        margin: 2rem auto;
+        padding: 2rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2.5rem;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .product-detail:hover {
+        transform: translateY(-5px);
+    }
+
+    /* Product image container */
+    .product-image-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .product-image {
+        max-width: 100%;
+        max-height: 450px;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+
+    .product-image:hover {
+        transform: scale(1.05);
+    }
+
+    /* Product info section */
+    .product-info {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+    }
+
+    .product-name {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #1a1a1a;
+        background: linear-gradient(to right, #0e0e0e, #0f0f0f);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    .product-price {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .original-price {
+        font-size: 1.3rem;
+        color: #999;
+        text-decoration: line-through;
+    }
+
+    .discount {
+        font-size: 1.3rem;
+        color: #e74c3c;
+        font-weight: 600;
+    }
+
+    .product-description {
+        font-size: 1.1rem;
+        color: #555;
+        line-height: 1.7;
+        margin-bottom: 2rem;
+    }
+
+    .product-stock {
+        margin-bottom: 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    .in-stock {
+        color: #2ecc71;
+        font-weight: 600;
+    }
+
+    .out-of-stock {
+        color: #e74c3c;
+        font-weight: 600;
+    }
+
+    /* Button and dropdown container */
+    .product-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .product-buttons form {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 0.9rem 2rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border: none;
+        cursor: pointer;
+        width: 180px; /* Consistent width for buttons */
+        height: 48px; /* Consistent height for buttons */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, #121213, #070707);
+        color: #ffffff;
+    }
+
+    .btn-success {
+        background: linear-gradient(45deg, #000000, #333333);
+        color: #ffffff;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(45deg, #6c757d, #868e96);
+        color: #ffffff;
+        cursor: not-allowed;
+    }
+
+    .btn-warning {
+        background: linear-gradient(45deg, #ffca2c, #ffda6e);
+        color: #333;
+    }
+
+    .btn-danger {
+        background: linear-gradient(45deg, #e74c3c, #ff6b6b);
+        color: #ffffff;
+    }
+
+    .btn-sm {
+        width: 100px;
+        height: 36px;
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    .btn:hover:not(.btn-secondary) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: width 0.4s ease, height 0.4s ease;
+    }
+
+    .btn:hover::after:not(.btn-secondary) {
+        width: 200px;
+        height: 200px;
+    }
+
+    /* Dropdown (select) styling */
+    .size-selector, .attribute-selector {
+        position: relative;
+        width: 180px; /* Match button width */
+        height: 48px; /* Match button height */
+    }
+
+    .size-selector select, .attribute-selector select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        padding: 0.9rem 2.5rem 0.9rem 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        width: 100%;
+        height: 100%;
+        background: #ffffff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        color: #333;
+        display: flex;
+        align-items: center;
+    }
+
+    .size-selector select:focus, .attribute-selector select:focus {
+        border-color: #141515;
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+        outline: none;
+    }
+
+    .size-selector select:hover, .attribute-selector select:hover {
+        border-color: #767a7e;
+    }
+
+    /* Custom chevron for select */
+    .size-selector::after, .attribute-selector::after {
+        content: '\f078'; /* Font Awesome chevron-down */
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+        pointer-events: none;
+    }
+
+    /* Comments section */
+    .comments-section {
+        margin-top: 2.5rem;
+        padding: 2rem;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    .comments-section h3 {
+        font-size: 1.6rem;
+        margin-bottom: 1.5rem;
+        color: #1a1a1a;
+        font-weight: 600;
+    }
+
+    .comment-form {
+        margin-bottom: 2rem;
+    }
+
+    .comment-form textarea {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        resize: vertical;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .comment-form textarea:focus {
+        border-color: #090909;
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+        outline: none;
+    }
+
+    .comment {
+        border-bottom: 1px solid #eee;
+        padding: 1.5rem 0;
+        transition: background-color 0.3s ease;
+    }
+
+    .comment:hover {
+        background-color: #f8f9fa;
+    }
+
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.95rem;
+        color: #666;
+        margin-bottom: 0.75rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .comment-username {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .comment-date {
+        font-style: italic;
+    }
+
+    .comment-actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .comment-text {
+        font-size: 1rem;
+        color: #444;
+        line-height: 1.6;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Inline edit form */
+    .edit-comment-form {
+        display: none;
+        margin-top: 1rem;
+    }
+
+    .edit-comment-form textarea {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        resize: vertical;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .edit-comment-form textarea:focus {
+        border-color: #090909;
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+        outline: none;
+    }
+
+    .edit-comment-form .btn {
+        width: 120px;
+        height: 40px;
+        margin-right: 0.5rem;
+    }
+
+    /* Similar products section */
+    .similar-products-section {
+        margin: 3rem auto;
+        padding: 2rem;
+        max-width: 1280px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    }
+
+    .similar-products-section h3 {
+        font-size: 1.6rem;
+        margin-bottom: 1.5rem;
+        color: #1a1a1a;
+        font-weight: 600;
+    }
+
+    .similar-products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .similar-product {
+        background: #ffffff;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        text-decoration: none; /* Remove underline from the link */
+    }
+
+    .similar-product:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        transform: translateY(-5px);
+    }
+
+    .similar-product img {
+        max-width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .similar-product h4 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .similar-product p {
+        font-size: 1rem;
+        color: #e74c3c;
+        font-weight: 600;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(10px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive design */
+    @media (max-width: 992px) {
+        .product-detail {
+            grid-template-columns: 1fr;
+            padding: 1.5rem;
+        }
+
+        .product-image-container {
+            padding: 1rem;
+        }
+
+        .product-name {
+            font-size: 2rem;
+        }
+
+        .product-price {
+            font-size: 1.6rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .product-buttons {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .product-buttons form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn {
+            width: 100%;
+            max-width: 300px; /* Limit width on mobile for better appearance */
+            margin: 0 auto;
+        }
+
+        .size-selector, .attribute-selector {
+            width: 100%;
+            max-width: 300px; /* Match button width on mobile */
+            margin: 0 auto;
+        }
+
+        .comments-section {
+            padding: 1.5rem;
+        }
+
+        .similar-products-section {
+            padding: 1.5rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .product-name {
+            font-size: 1.8rem;
+        }
+
+        .product-price {
+            font-size: 1.4rem;
+        }
+
+        .product-description {
+            font-size: 1rem;
+        }
+
+        .comments-section h3, .similar-products-section h3 {
+            font-size: 1.4rem;
+        }
+
+        .similar-product img {
+            height: 140px;
+        }
+
+        .comment-actions {
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .edit-comment-form .btn {
+            width: 100px;
+            height: 36px;
+        }
+    }
+</style>
+
+<div class="product-detail">
+    <div class="product-image-container">
+        <div style="width: 100%; height: 400px; display: flex; align-items: center; justify-content: center;">
+            <img src="{{ product.api_image_url }}" alt="{{ product.api_name }}" class="product-image">
+        </div>
+    </div>
+    
+    <div class="product-info">
+        <h1 class="product-name">{{ product.api_name }}</h1>
+        <div class="product-price">
+            {% if product.discount_percentage > 0 %}
+                <span class="original-price">₹{{ product.original_price }}</span>
+                ₹{{ product.price }}
+                <span class="discount">({{ product.discount_percentage }}% off)</span>
+            {% else %}
+                ₹{{ product.price }}
+            {% endif %}
+        </div>
+        
+        <div class="product-description">
+            <p>{{ product.api_description }}</p>
+            <p>Category: {{ product.category }}</p>
+        </div>
+        
+        <div class="product-stock">
+            {% if product.stock > 0 %}
+                <span class="in-stock">In Stock ({{ product.stock }} available)</span>
+            {% else %}
+                <span class="out-of-stock">Out of Stock</span>
+            {% endif %}
+        </div>
+        
+        <div class="product-buttons">
+            {% if product.stock > 0 %}
+                {% if product.size_list or product.attribute_list %}
+                    <form method="POST" action="{% url 'add_to_cart' product.id %}">
+                        {% csrf_token %}
+                        {% if product.size_list %}
+                            <div class="size-selector">
+                                <select name="size" required>
+                                    <option value="" disabled selected>Select Size</option>
+                                    {% for size in product.size_list %}
+                                        <option value="{{ size }}">{{ size }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% endif %}
+                        {% if product.attribute_list %}
+                            <div class="attribute-selector">
+                                <select name="attributes" required>
+                                    <option value="" disabled selected>Select Attribute</option>
+                                    {% for attr in product.attribute_list %}
+                                        <option value="{{ attr }}">{{ attr }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-success">Add to Cart</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'add_to_cart' product.id %}" class="btn btn-success">Add to Cart</a>
+                {% endif %}
+            {% else %}
+                <span class="btn btn-secondary">Out of Stock</span>
+            {% endif %}
+        </div>
+
+        <!-- Comments Section -->
+        <div class="comments-section">
+            <h3>Customer Comments</h3>
+            {% if user.is_authenticated %}
+                <form class="comment-form" method="POST" action="{% url 'submit_comment' product.id %}">
+                    {% csrf_token %}
+                    <textarea name="comment" rows="4" placeholder="Write your comment here..." required></textarea>
+                    <button type="submit" class="btn btn-primary">Submit Comment</button>
+                </form>
+            {% else %}
+                <p>Please <a href="{% url 'login' %}">log in</a> to submit a comment.</p>
+            {% endif %}
+            
+            {% if comments %}
+                {% for comment in comments %}
+                    <div class="comment" id="comment-{{ comment.id }}">
+                        <div class="comment-header">
+                            <span class="comment-username">{{ comment.username }}</span>
+                            <div class="comment-actions">
+                                <span class="comment-date">{{ comment.created_at|date:"Y-m-d H:i" }}</span>
+                                {% if comment.is_editable %}
+                                    <button type="button" class="btn btn-sm btn-warning edit-comment-btn" data-comment-id="{{ comment.id }}">Edit</button>
+                                    <form method="POST" action="{% url 'delete_comment' comment.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this comment?');">Delete</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="comment-text" id="comment-text-{{ comment.id }}">{{ comment.comment }}</div>
+                        <!-- Inline Edit Form -->
+                        <form class="edit-comment-form" id="edit-form-{{ comment.id }}" method="POST" action="{% url 'update_comment' comment.id %}">
+                            {% csrf_token %}
+                            <textarea name="comment" rows="4" required>{{ comment.comment }}</textarea>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-secondary cancel-edit-btn" data-comment-id="{{ comment.id }}">Cancel</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No comments yet. Be the first to comment!</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Similar Products Section -->
+<div class="similar-products-section">
+    <h3>Similar Products</h3>
+    {% if similar_products %}
+        <div class="similar-products-grid">
+            {% for similar_product in similar_products %}
+                <a href="{% url 'product_detail' similar_product.id %}" class="similar-product">
+                    <img src="{{ similar_product.image_url }}" alt="{{ similar_product.name }}">
+                    <h4>{{ similar_product.name }}</h4>
+                    <p>₹{{ similar_product.price }}</p>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No similar products available.</p>
+    {% endif %}
+</div>
+
+<!-- JavaScript to toggle edit form -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle Edit button click
+        document.querySelectorAll('.edit-comment-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = this.getAttribute('data-comment-id');
+                const commentText = document.getElementById(`comment-text-${commentId}`);
+                const editForm = document.getElementById(`edit-form-${commentId}`);
+
+                // Hide the comment text and show the edit form
+                commentText.style.display = 'none';
+                editForm.style.display = 'block';
+                this.style.display = 'none'; // Hide the Edit button while editing
+            });
+        });
+
+        // Handle Cancel button click
+        document.querySelectorAll('.cancel-edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const commentId = this.getAttribute('data-comment-id');
+                const commentText = document.getElementById(`comment-text-${commentId}`);
+                const editForm = document.getElementById(`edit-form-${commentId}`);
+                const editButton = document.querySelector(`.edit-comment-btn[data-comment-id="${commentId}"]`);
+
+                // Show the comment text and hide the edit form
+                commentText.style.display = 'block';
+                editForm.style.display = 'none';
+                editButton.style.display = 'inline-block'; // Show the Edit button again
+            });
+        });
+    });
+</script>
+{% endblock %}

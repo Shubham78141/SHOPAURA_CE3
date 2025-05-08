@@ -1,0 +1,146 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Sales Report{% endblock %}
+
+{% block header_buttons %}
+<div class="btn-group me-2">
+    <a href="?period=7" class="btn btn-sm btn-outline-secondary {% if period == 7 %}active{% endif %}">7 Days</a>
+    <a href="?period=30" class="btn btn-sm btn-outline-secondary {% if period == 30 %}active{% endif %}">30 Days</a>
+    <a href="?period=90" class="btn btn-sm btn-outline-secondary {% if period == 90 %}active{% endif %}">90 Days</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Sales Over Time</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-area" style="height: 400px;">
+                    {% if sales_by_day %}
+                        <canvas id="salesChart"></canvas>
+                    {% else %}
+                        <p class="text-center text-muted">No sales data available for this period.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Top Products</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Units Sold</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in top_products %}
+                        <tr>
+                            <td>{{ product.product__name }}</td>
+                            <td>{{ product.total_sold }}</td>
+                            <td>₹{{ product.revenue|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3">No sales data</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Summary</h6>
+    </div>
+    <div class="card-body">
+        <p>Total Revenue: ₹{{ total_stats.total_revenue|floatformat:2|default:"0.00" }}</p>
+        <p>Total Orders: {{ total_stats.total_orders|default:"0" }}</p>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const salesChartCtx = document.getElementById('salesChart');
+        const rawSalesData = [
+            {% for day in sales_by_day %}
+                { date: '{{ day.date|date:"Y-m-d" }}', total: {{ day.total|default:"0" }}, count: {{ day.count|default:"0" }} }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        console.log('Raw sales_by_day:', rawSalesData);
+        
+        if (salesChartCtx && rawSalesData.length > 0) {
+            const labels = rawSalesData.map(item => item.date);
+            const data = rawSalesData.map(item => item.total);
+            
+            console.log('Chart labels:', labels);
+            console.log('Chart data:', data);
+
+            try {
+                const salesChart = new Chart(salesChartCtx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Sales (₹)',
+                            data: data,
+                            borderColor: 'rgba(78, 115, 223, 1)',
+                            backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Sales Amount (₹)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true
+                            }
+                        }
+                    }
+                });
+                console.log('Chart initialized successfully');
+            } catch (error) {
+                console.error('Error initializing chart:', error);
+            }
+        } else {
+            if (!salesChartCtx) {
+                console.error('Chart canvas element not found');
+            }
+            if (rawSalesData.length === 0) {
+                console.warn('No sales data available for chart');
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

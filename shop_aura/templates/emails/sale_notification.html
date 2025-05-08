@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ sale.name }} at SHOPAURA</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #2c3e50;">Exciting {{ sale.name }} at SHOPAURA!</h2>
+        <p>Hello!</p>
+        <p>We're thrilled to announce our {{ sale.name }}! Enjoy <strong>{{ sale.discount_percentage }}% off</strong> on all products until {{ sale.end_date|date:"F j, Y" }}.</p>
+        {% if sale.image_url %}
+        <img src="{{ sale.image_url }}" alt="{{ sale.name }}" style="max-width: 100%; height: auto; border-radius: 8px;">
+        {% endif %}
+        <p style="margin-top: 20px;">
+            <a href="{{ website_url }}" style="background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Shop the Sale Now</a>
+        </p>
+        <p>If you have any questions, contact our support team at <a href="mailto:support@shopaura.com">support@shopaura.com</a>.</p>
+        <p>Happy Shopping!</p>
+        <p style="margin-top: 30px; font-size: 14px; color: #777;">
+            Best regards,<br>
+            The SHOPAURA Team
+        </p>
+    </div>
+</body>
+</html>

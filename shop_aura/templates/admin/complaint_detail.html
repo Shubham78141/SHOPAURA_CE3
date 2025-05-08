@@ -1,0 +1,48 @@
+{% extends "admin/base.html" %}
+{% block page_title %}Complaint Details | SHOPAURA{% endblock %}
+{% block content_title %}Complaint from {{ complaint.name }}{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Complaint Details</h3>
+        </div>
+        <div class="card-body">
+            <p><strong>Name:</strong> {{ complaint.name }}</p>
+            <p><strong>Email:</strong> {{ complaint.email }}</p>
+            <p><strong>Submitted:</strong> {{ complaint.submitted_at|date:"Y-m-d H:i" }}</p>
+            <p><strong>Status:</strong> {{ complaint.status }}</p>
+            <p><strong>Message:</strong></p>
+            <p>{{ complaint.message }}</p>
+            {% if complaint.response %}
+            <hr>
+            <p><strong>Response:</strong></p>
+            <p>{{ complaint.response }}</p>
+            <p><strong>Responded by:</strong> {{ complaint.responded_by.email }}</p>
+            <p><strong>Responded at:</strong> {{ complaint.responded_at|date:"Y-m-d H:i" }}</p>
+            {% endif %}
+            {% if complaint.status != 'Resolved' %}
+            <hr>
+            <h4>Respond to Complaint</h4>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="response" class="form-label">Response</label>
+                    <textarea class="form-control" id="response" name="response" rows="5" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status" required>
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if value == complaint.status %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Response</button>
+                <a href="{% url 'admin_complaints' %}" class="btn btn-secondary">Back to Complaints</a>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

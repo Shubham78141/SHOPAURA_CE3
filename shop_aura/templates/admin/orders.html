@@ -1,0 +1,60 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Orders{% endblock %}
+
+{% block header_buttons %}
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-sm btn-outline-secondary">Back to Dashboard</a>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">All Orders</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Customer</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.user.email }}</td>
+                        <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if order.status == 'Pending' %}bg-warning{% endif %}
+                                {% if order.status == 'Processing' %}bg-info{% endif %}
+                                {% if order.status == 'Shipped' %}bg-success{% endif %}
+                                {% if order.status == 'Delivered' %}bg-primary{% endif %}
+                                {% if order.status == 'Cancelled' %}bg-danger{% endif %}"
+                            >
+                                {{ order.status }}
+                            </span>
+                        </td>
+                        <td>₹{{ order.total_amount|floatformat:2 }}</td>
+                        <td>
+                            <a href="{% url 'admin_order_detail' order.id %}" 
+                               class="btn btn-sm btn-outline-primary">View Details</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No orders found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+<div class="container">
+    <h1>Manage Sales</h1>
+    <a href="{% url 'admin_sale_add' %}" class="btn btn-primary">Add New Sale</a>
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Discount (%)</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sale in sales %}
+            <tr>
+                <td>{{ sale.name }}</td>
+                <td>{{ sale.discount_percentage }}</td>
+                <td>{{ sale.start_date|date:"Y-m-d H:i" }}</td>
+                <td>{{ sale.end_date|date:"Y-m-d H:i" }}</td>
+                <td>{{ sale.is_active|yesno:"Yes,No" }}</td>
+                <td>
+                    <a href="{% url 'admin_sale_edit' sale.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'admin_sale_delete' sale.id %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No sales available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

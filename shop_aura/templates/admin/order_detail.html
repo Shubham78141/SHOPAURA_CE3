@@ -1,0 +1,129 @@
+{% extends "admin/base.html" %}
+
+{% block page_title %}Order #{{ order.id }}{% endblock %}
+
+{% block header_buttons %}
+    <a href="{% url 'admin_orders' %}" classDiagram
+btn btn-sm btn-outline-secondary">Back to Orders</a>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Order #{{ order.id }} Details</h6>
+    </div>
+    <div class="card-body">
+        <!-- Order Summary -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h5>Customer Information</h5>
+                <p><strong>Email:</strong> {{ order.user.email }}</p>
+                <p><strong>Name:</strong> {{ order.user.first_name }} {{ order.user.last_name }}</p>
+                <p><strong>Joined:</strong> {{ order.user.date_joined|date:"M d, Y" }}</p>
+            </div>
+            <div class="col-md-6">
+                <h5>Shipping Information</h5>
+                <p>{{ order.address }}</p>
+                <p>{{ order.city }}, {{ order.state }} {{ order.zip_code }}</p>
+                <p>{{ order.country }}</p>
+            </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="mb-4">
+            <h5>Order Items</h5>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order_items %}
+                        <tr>
+                            <td>{{ item.product.name }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>₹{{ item.price|floatformat:2 }}</td>
+                            <td>₹{{ item.total_price|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No items in this order</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Order Total:</strong></td>
+                            <td><strong>₹{{ order.total_amount|floatformat:2 }}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Order Status -->
+        <div class="mb-4">
+            <h5>Order Status</h5>
+            <p>Current Status: 
+                <span class="badge 
+                    {% if order.status == 'Pending' %}bg-warning{% endif %}
+                    {% if order.status == 'Processing' %}bg-info{% endif %}
+                    {% if order.status == 'Shipped' %}bg-success{% endif %}
+                    {% if order.status == 'Delivered' %}bg-primary{% endif %}
+                    {% if order.status == 'Cancelled' %}bg-danger{% endif %}"
+                >
+                    {{ order.status }}
+                </span>
+            </p>
+            <form method="post" class="mt-2">
+                {% csrf_token %}
+                <div class="input-group mb-2 w-50">
+                    <select name="status" class="form-select">
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if value == order.status %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">Update Status</button>
+                </div>
+                <div class="mb-2">
+                    <textarea name="notes" class="form-control" placeholder="Add notes (e.g., shipping details, reason for status change)" rows="3"></textarea>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tracking History -->
+        <div class="mb-4">
+            <h5>Tracking History</h5>
+            {% if tracking_history %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in tracking_history %}
+                            <tr>
+                                <td>{{ entry.status }}</td>
+                                <td>{{ entry.updated_at|date:"M d, Y H:i" }}</td>
+                                <td>{{ entry.notes|default:"No notes" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p>No tracking history available.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
